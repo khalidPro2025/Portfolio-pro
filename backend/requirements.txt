@@ -1,0 +1,50 @@
+# ============================================================
+# Dépendances Python pour Portfolio-pro
+# ============================================================
+
+# Framework Web
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-RESTful==0.3.10
+
+# Base de données
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.21
+psycopg2-binary==2.9.9
+pymongo==4.5.0
+
+# Authentification et sécurité
+Flask-JWT-Extended==4.5.3
+python-dotenv==1.0.0
+bcrypt==4.1.1
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+
+# Validations et utilitaires
+marshmallow==3.20.1
+email-validator==2.0.0
+click==8.1.7
+
+# Pour les requêtes HTTP
+requests==2.31.0
+
+# Logging et monitoring
+python-json-logger==2.0.7
+
+# Serveur de production
+gunicorn==21.2.0
+
+# Variables d'environnement
+environs==9.5.0
+
+# Cache
+redis==5.0.1
+
+# Upload de fichiers
+Pillow==10.1.0
+
+# Email
+Flask-Mail==0.9.1
+
+# Documentation API
+flasgger==0.9.7.1

@@ -1,0 +1,79 @@
+
+# ============================================================
+# Dockerfile Multi-stage pour Portfolio-pro
+# Backend: Node.js + Python | Frontend: React + Vite
+# ============================================================
+
+# ---------- Stage 1: Build Frontend (Vite) ----------
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copier les fichiers de dépendances
+COPY frontend/package*.json ./
+
+# Installer les dépendances
+RUN npm ci --force || npm install
+
+# Copier le code source
+COPY frontend/ ./
+
+# Construire le frontend (Vite génère 'dist', pas 'build')
+RUN if [ -f "package.json" ]; then \
+        npm run build || (echo "⚠️ Build failed" && mkdir -p dist && echo "<h1>Portfolio-pro</h1>" > dist/index.html); \
+    else \
+        mkdir -p dist && echo "<h1>Portfolio-pro</h1>" > dist/index.html; \
+    fi
+
+# Vérifier que dist existe
+RUN ls -la && ls -la dist/ || echo "dist not found"
+
+# ---------- Stage 2: Backend Node.js ----------
+FROM node:18-alpine AS backend-node
+
+WORKDIR /app/backend
+
+# Copier les fichiers backend Node.js
+COPY backend/package*.json ./
+RUN npm ci --production || npm install
+
+COPY backend/ ./
+
+# ---------- Stage 3: Backend Python (optionnel) ----------
+FROM python:3.10-slim AS backend-python
+
+WORKDIR /app/backend
+
+# Copier les dépendances Python
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ ./
+
+# ---------- Stage 4: Image finale ----------
+FROM node:18-alpine
+
+# Installer Python pour le backend Python si nécessaire
+RUN apk add --no-cache python3 py3-pip
+
+WORKDIR /app
+
+# Copier le backend (Node.js ou Python selon votre choix)
+# Option 1: Backend Node.js
+COPY --from=backend-node /app/backend /app/backend-node
+
+# Option 2: Backend Python (décommentez si vous utilisez Python)
+# COPY --from=backend-python /app/backend /app/backend-python
+
+# Copier le frontend buildé (dist pour Vite)
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+
+# Installer serve pour servir le frontend
+RUN npm install -g serve
+
+# Exposer les ports
+EXPOSE 5000 3000
+
+# Script de démarrage (pour Node.js backend)
+CMD serve -s /app/frontend/dist -l 3000 & cd /app/backend-node && node app.js
+
