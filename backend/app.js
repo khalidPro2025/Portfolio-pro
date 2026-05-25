@@ -52,10 +52,10 @@ app.use((req, res) => {
 // ── DÉMARRAGE DU SERVEUR ─────────────────────────────────────
 // CORRECTION 3 : app.listen() est maintenant EN DERNIER
 // Le PORT vient du .env (PORT=5000)
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT;
 
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log("Serveur démarré sur le port", port);
 });
 
 // CORRECTION 4 : On n'affiche PLUS la chaîne MongoDB en console
